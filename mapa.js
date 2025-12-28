@@ -5,60 +5,44 @@ const img = new Image();
 img.src = "mapa.webp";
 
 const SIZE = 1299;
-const CENTER = SIZE / 2;
-const ANGLE = 45 * Math.PI / 180; // 45°
+let markers = []; // tablica przechowująca punkty
 
-img.onload = () => {
-  // czyścimy canvas
+// rysowanie mapy i wszystkich markerów
+function drawMap() {
   ctx.clearRect(0, 0, SIZE, SIZE);
+  ctx.drawImage(img, 0, 0, SIZE, SIZE);
 
-  // rysujemy obróconą mapę
-  ctx.save();
-  ctx.translate(CENTER, CENTER);
-  ctx.rotate(ANGLE);
-  ctx.drawImage(img, -CENTER, -CENTER, SIZE, SIZE);
-  ctx.restore();
-};
-
-canvas.addEventListener("click", (e) => {
-  const rect = canvas.getBoundingClientRect();
-  const scale = canvas.width / rect.width;
-
-  // współrzędne kliknięcia na canvas
-  let x = (e.clientX - rect.left) * scale;
-  let y = (e.clientY - rect.top) * scale;
-
-  // przenosimy do środka
-  x -= CENTER;
-  y -= CENTER;
-
-  // cofamy obrót (-45°)
-  const rx = x * Math.cos(-ANGLE) - y * Math.sin(-ANGLE);
-  const ry = x * Math.sin(-ANGLE) + y * Math.cos(-ANGLE);
-
-  // wracamy do układu mapy
-  const mapX = Math.round(rx + CENTER);
-  const mapY = Math.round(ry + CENTER);
-
-  if (mapX >= 1 && mapX <= SIZE && mapY >= 1 && mapY <= SIZE) {
-    document.getElementById("coords").textContent =
-      `X: ${mapX}, Y: ${mapY}`;
-
-    // odrysuj mapę
-    img.onload();
-
-    // marker w miejscu kliknięcia
+  // rysujemy markery
+  markers.forEach(marker => {
     ctx.fillStyle = "red";
     ctx.beginPath();
-    ctx.arc(
-      x + CENTER,
-      y + CENTER,
-      4,
-      0,
-      Math.PI * 2
-    );
+    ctx.arc(marker.x - 1, marker.y - 1, 5, 0, Math.PI * 2);
     ctx.fill();
-  } else {
-    document.getElementById("coords").textContent = "Poza mapą";
+
+    // wyświetlamy współrzędne obok markera
+    ctx.fillStyle = "black";
+    ctx.font = "14px Arial";
+    ctx.fillText(`(${marker.x}, ${marker.y})`, marker.x + 6, marker.y - 6);
+  });
+}
+
+img.onload = drawMap;
+
+// kliknięcie dodaje punkt
+canvas.addEventListener("click", (e) => {
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = canvas.width / rect.width;
+  const scaleY = canvas.height / rect.height;
+
+  const x = Math.floor((e.clientX - rect.left) * scaleX) + 1;
+  const y = Math.floor((e.clientY - rect.top) * scaleY) + 1;
+
+  if (x >= 1 && x <= SIZE && y >= 1 && y <= SIZE) {
+    // dodajemy marker
+    markers.push({ x, y });
+    drawMap();
+
+    // aktualizujemy panel z ostatnim kliknięciem
+    document.getElementById("coords").textContent = `Dodano punkt: X: ${x}, Y: ${y}`;
   }
 });
