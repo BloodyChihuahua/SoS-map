@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<title>Mapa ze współrzędnymi</title>
+
+<style>
+  body {
+    margin: 0;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background: #f4f4f4;
+  }
+
+  canvas {
+    border: 1px solid #333;
+    max-width: 90vw;
+    height: auto;
+    background: #fff;
+  }
+
+  #coords {
+    margin-top: 10px;
+    font-size: 18px;
+    font-weight: bold;
+  }
+</style>
+</head>
+<body>
+
+<h2>Interaktywna mapa</h2>
+<p>Kliknij w mapę, aby odczytać współrzędne</p>
+
+<canvas id="mapCanvas" width="1299" height="1299"></canvas>
+
+<div id="coords">X: -, Y: -</div>
+
+<script src="mapa.js"></script>
+</body>
+</html>
